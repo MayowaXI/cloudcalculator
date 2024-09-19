@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>To the Power of Math!</title>
+    <title>Advanced Calculator</title>
     <!-- Styling for the client UI -->
     <style>
     h1 {
@@ -39,40 +39,79 @@
         margin-top: 20px;
         width: 100px;
     }
+    select {
+        font-family: system-ui;
+        font-size: 18px;
+        margin-left: 20px;
+        margin-top: 20px;
+        color: #222629;
+        width: 100px;
+    }
     </style>
     <script>
-        // callAPI function that takes the base and exponent numbers as parameters
+        // callAPI function for exponentiation using API Gateway
         var callAPI = (base, exponent) => {
-            // instantiate a headers object
             var myHeaders = new Headers();
-            // add content type header to object
             myHeaders.append("Content-Type", "application/json");
-            // using built-in JSON utility package turn object to string and store in a variable
             var raw = JSON.stringify({ "base": base, "exponent": exponent });
-            // create a JSON object with parameters for API call and store in a variable
             var requestOptions = {
                 method: 'POST',
                 headers: myHeaders,
                 body: raw,
                 redirect: 'follow'
             };
-            // make API call with parameters and use promises to get response
+            // API call for exponentiation
             fetch("https://jwz84ww2ye.execute-api.us-east-1.amazonaws.com/dev", requestOptions)
                 .then(response => response.text())
-                .then(result => alert(JSON.parse(result).body))
+                .then(result => alert("Result: " + JSON.parse(result).body))
                 .catch(error => console.log('error', error));
+        }
+
+        // Client-side calculator logic for basic operations
+        var calculate = (operation) => {
+            var num1 = parseFloat(document.getElementById('num1').value);
+            var num2 = parseFloat(document.getElementById('num2').value);
+            var result;
+
+            switch (operation) {
+                case '+':
+                    result = num1 + num2;
+                    break;
+                case '-':
+                    result = num1 - num2;
+                    break;
+                case '*':
+                    result = num1 * num2;
+                    break;
+                case '/':
+                    result = (num2 !== 0) ? num1 / num2 : "Error (divide by 0)";
+                    break;
+                case '^':
+                    callAPI(num1, num2);  // For exponentiation, we use the API
+                    return;
+                default:
+                    result = "Invalid operation";
+            }
+            alert("Result: " + result);
         }
     </script>
 </head>
 <body>
-    <h1>TO THE POWER OF MATH!</h1>
+    <h1>Advanced Calculator</h1>
     <form>
-        <label>Base number:</label>
-        <input type="text" id="base">
-        <label>...to the power of:</label>
-        <input type="text" id="exponent">
-        <!-- set button onClick method to call function we defined passing input values as parameters -->
-        <button type="button" onclick="callAPI(document.getElementById('base').value,document.getElementById('exponent').value)">CALCULATE</button>
+        <label>First number:</label>
+        <input type="text" id="num1">
+        <label>Second number:</label>
+        <input type="text" id="num2">
+        <label>Operation:</label>
+        <select id="operation">
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+            <option value="^">^ (Power)</option>
+        </select>
+        <button type="button" onclick="calculate(document.getElementById('operation').value)">CALCULATE</button>
     </form>
 </body>
 </html>
