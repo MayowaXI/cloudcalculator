@@ -1,117 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Advanced Calculator</title>
-    <!-- Styling for the client UI -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To the Power of Math!</title>
     <style>
-    h1 {
-        color: #FFFFFF;
-        font-family: system-ui;
-        margin-left: 20px;
-    }
-    body {
-        background-color: #222629;
-    }
-    label {
-        color: #86C232;
-        font-family: system-ui;
-        font-size: 20px;
-        margin-left: 20px;
-        margin-top: 20px;
-    }
-    button {
-        background-color: #86C232;
-        border-color: #86C232;
-        color: #FFFFFF;
-        font-family: system-ui;
-        font-size: 20px;
-        font-weight: bold;
-        margin-left: 30px;
-        margin-top: 20px;
-        width: 140px;
-    }
-    input {
-        color: #222629;
-        font-family: system-ui;
-        font-size: 20px;
-        margin-left: 10px;
-        margin-top: 20px;
-        width: 100px;
-    }
-    select {
-        font-family: system-ui;
-        font-size: 18px;
-        margin-left: 20px;
-        margin-top: 20px;
-        color: #222629;
-        width: 100px;
-    }
+        body {
+            background-color: #2c3e50;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .calculator {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        h1 {
+            color: #3498db;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .result {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
     </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>TO THE POWER OF MATH!</h1>
+        <label>Base number:</label>
+        <input type="text" id="base">
+        
+        <label>...to the power of:</label>
+        <input type="text" id="exponent">
+        
+        <label>Operation:</label>
+        <select id="operation">
+            <option value="power">Power</option>
+            <option value="add">Add</option>
+            <option value="subtract">Subtract</option>
+            <option value="multiply">Multiply</option>
+            <option value="divide">Divide</option>
+        </select>
+
+        <button type="button" onclick="callAPI(document.getElementById('base').value,document.getElementById('exponent').value,document.getElementById('operation').value)">CALCULATE</button>
+        
+        <div class="result" id="result"></div>
+    </div>
+
     <script>
-        // callAPI function for exponentiation using API Gateway
-        var callAPI = (base, exponent) => {
+        // callAPI function that takes base, exponent, and operation as parameters
+        var callAPI = (base, exponent, operation) => {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
-            var raw = JSON.stringify({ "base": base, "exponent": exponent });
+
+            var raw = JSON.stringify({
+                "base": base,
+                "exponent": exponent,
+                "operation": operation
+            });
+
             var requestOptions = {
                 method: 'POST',
                 headers: myHeaders,
                 body: raw,
                 redirect: 'follow'
             };
-            // API call for exponentiation
+
             fetch("https://jwz84ww2ye.execute-api.us-east-1.amazonaws.com/dev", requestOptions)
-                .then(response => response.text())
-                .then(result => alert("Result: " + JSON.parse(result).body))
+                .then(response => response.json())
+                .then(result => document.getElementById('result').innerText = result.body)
                 .catch(error => console.log('error', error));
         }
-
-        // Client-side calculator logic for basic operations
-        var calculate = (operation) => {
-            var num1 = parseFloat(document.getElementById('num1').value);
-            var num2 = parseFloat(document.getElementById('num2').value);
-            var result;
-
-            switch (operation) {
-                case '+':
-                    result = num1 + num2;
-                    break;
-                case '-':
-                    result = num1 - num2;
-                    break;
-                case '*':
-                    result = num1 * num2;
-                    break;
-                case '/':
-                    result = (num2 !== 0) ? num1 / num2 : "Error (divide by 0)";
-                    break;
-                case '^':
-                    callAPI(num1, num2);  // For exponentiation, we use the API
-                    return;
-                default:
-                    result = "Invalid operation";
-            }
-            alert("Result: " + result);
-        }
     </script>
-</head>
-<body>
-    <h1>Advanced Calculator</h1>
-    <form>
-        <label>First number:</label>
-        <input type="text" id="num1">
-        <label>Second number:</label>
-        <input type="text" id="num2">
-        <label>Operation:</label>
-        <select id="operation">
-            <option value="+">+</option>
-            <option value="-">-</option>
-            <option value="*">*</option>
-            <option value="/">/</option>
-            <option value="^">^ (Power)</option>
-        </select>
-        <button type="button" onclick="calculate(document.getElementById('operation').value)">CALCULATE</button>
-    </form>
 </body>
 </html>
